@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+body { font-family: Verdana, Geneva; font-style: normal; font-size: 8pt; color: black; background: white; margin: 0; padding: 0; }
+h1 { font-family: Arial, Verdana; font-weight: normal; font-size: 32pt; color: black; background: lightblue; text-align: center; margin: 0; }
+h2 { font-family: Arial, Verdana; font-weight: normal; font-size: 16pt; color: black; background: khaki; margin: 0; }
+h3 { font-family: Arial, Verdana; text-align: center; font-weight: bold; font-size: 12pt; color: black; border: 2px solid darkblue; border-radius: 10px; }
+h4 { font-family: Arial, Verdana; font-weight: normal; font-size: 20pt; color: black; font-weight: bold; background: khaki; margin: 0; }
+h5 { font-family: Arial, Verdana; font-weight: normal; font-size: 16pt; color: black; background: lightblue; margin: 0; }
+
+main { display: flex; justify-content: center; }
+table { width: 100%; }
+tr:nth-child(odd) { background-color: #eee; }
+th { background-color: #555; color: #fff; text-align: left; padding: 0.5em 1em; }
+td { font-family: Verdana, Geneva; font-weight: bold; font-size: 10pt; color: black; text-align: left; padding: 0.5em 1em;}
+
+.CenterAlign { text-align: center; }
+.Bill_Transfer { text-align: center; color: green; }
+.LogoutButton { text-align: center; background: #F08080; }
+
+.footer { position: fixed; left: 0; bottom: 0; width: 100%; background-color: lightblue; color: grey; text-align: center; }

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<h2>Assignment Report</h2>
+</head>
+
+<body>
+<pre>
+<h3>Login Details:</h3>
+Login details are provided below. There are 2 users in the BOD_USERS database, both of whose credentials seen 
+below can be used to log in (login.jsp) and interact with the banking website. Two users were created for the purpose
+of showing how the current user logged in can only view their details and account transactions, despite the
+databases holding multiple account details and transactions.
+
+User 1:
+Username: username
+Password: password
+		
+User 2:
+Username: smurph
+Password: mypass
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<h3>General Operation:</h3>
+<h4>Login</h4>
+The login.jsp page links to the loginServlet.java servlet to do user validation by comparing the username and password
+passed in to the BOD_USERS database and get the session parameters, where it links verified users to the accountInfo.jsp.
+This page is the users account information page which displays their name, account number, email and branch and also lets
+them view their accounts, transfer money between these accounts, pay a bill or search for an ATM location.
+The Accounts.java class is used to provide getter and setters for the arraylist in the accountInfoServlet.java servlet.
+
+<h4>Account Information & Navigation (Previous Transactions, Transfers, Bill Payment)</h4>
+From here the user has many options where they can go to the currentAccount.jsp which links to the 
+accountInfoServlet.java servlet to retrieve the current user's current account transactions or to the 
+savingsAccount.jsp which links to the accountInfoServlet.java servlet to retrieve the current user's savings account 
+transactions. They can also navigate to transfers.jsp to perform transfers between their accounts, through a redirect 
+in the accountInfoServlet.java servlet or to billPayment.jsp to pay a bill from either of their accounts, again through 
+a redirect in the accountInfoServlet.java servlet. They can also search locations to find ATMs where ajax is used to 
+allow in page replacement of locations found without the need to refresh the accountInfo.jsp (Bonus Feature). It uses 
+ajax in accountInfo.jsp, javascript in ajax_javascript.js, the ajax_javascriptServlet.java servlet and the BOD_ATMS 
+database to perform this.
+
+<h4>Transfer Between Accounts</h4>
+When the user has navigated to transfers.jsp, a form must be completed to get the account they want to transfer
+from to the account that they would like to transfer to. It also contains the amount they would like to transfer
+and a button to submit the form to the transfersServlet.java servlet. This servlet processes all the information
+received from this form and current session parameters to update the BOD_CURRENT_ACCOUNT and BOD_SAVINGS_ACCOUNT
+databases accordingly and then redirects the user back to accountInfo.jsp with a message to confirm the transfer has
+taken place. The user cannot transfer between the same account, i.e. current account to current account and the 
+current date is added to the database whenever a transfer is made between accounts where one account is debited and
+the other account is credited. 
+
+<h4>Pay A Bill</h4>
+When the user has navigated to billPayment.jsp, a form must be completed to get the account they want to pay
+from and the bill they would like to pay. It also contains the amount they would like to pay and a button to submit 
+the form to the billPaymentServlet.java servlet. This servlet processes all the information received from this form 
+and current session parameters to update the BOD_CURRENT_ACCOUNT or BOD_SAVINGS_ACCOUNT databases accordingly based on 
+which one was selected and then redirects the user back to accountInfo.jsp with a message to confirm the payment has
+taken place. The current date is added to the database when a payment is made and the account that was selected is debited.
+
+<h4>Other Notes & Features</h4>
+Note that when a transfer is made or a bill payment is made, the user is redirected to the account information page where 
+the transactions can then be viewed in either the current account or the savings account. The transaction_id increases per
+transaction between all users, i.e. if user 1 makes a transaction it is 1, then if user 2 makes a transaction it is 2, then 
+if user 1 makes a transaction again it is 3. This means that each transaction has an unique id. Users are also not allowed
+to make transactions if they have no money in their account.
+
+The CSS for all jsps can be seen in login.css, AccountInfo.css and CurrentSavingsAccounts.css in the CSS folder. Any 
+images used can be seen in the images folder. 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<h3>Bonus Features:</h3>
+- Ajax was implemented with javascript to allow the in page replacement of data being searched for
+
+- Form validations are performed on the client side where "required" is used within input tags. This means that
+  forms cannot be submitted until all of the relevant fields are completed. On top of this certain fields required
+  specific input types, such as currency. This format was also specified in the input tags.
+  
+- Session tracking is also performed using HTTP session, where a user has a session created on login with their specific 
+  details from the database. These details are then passed to all subsequent pages providing the session remains open.
+  
+- Each jsp has a logout button, when pressed goes to a relevant servlet to kill the current session and log the user out
+  by returning them to the login.jsp. This is important to kill the session as session tracking is active before logging
+  out. However, the browser cache still holds the session parameters and therefore if the user goes back a page, their
+  information can still be seen.
+  
+- There is a timeout after 2 minutes of inactivity from a user, which redirects them back to the login page notifying 
+  them that they have been logged out.
+
+- The taglibs-standard-impl-1.2.5.jar and taglibs-standard-spec-1.2.5.jar jar files were imported in the lib folder in 
+  WEB-INF to allow the use of the "c:forEach" loops in jsps. These are obtained from the oracle website.
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+<h3>SQL Used:</h3>
+<h4>BOD_USERS Database:</h4>
+CREATE TABLE BOD_USERS
+        (Account_Number integer,
+         Firstname varchar(30) not null,
+         Surname varchar(30) not null,
+         Email varchar(80) not null,
+         Branch varchar(30) not null,
+         Username varchar(30) not null,
+         Password varchar(30) not null,
+         PRIMARY KEY (Account_Number))
+         
+insert into bod_users values (12345,'John','Smith','jsmith@coldmail.com','Sutton','username','password')
+insert into bod_users values (54321,'Sarah','Murphy','smurph@hotmail.com','Raheny','smurph','mypass')
+
+
+<h4>BOD_CURRENT_ACCOUNT Database:</h4>
+CREATE TABLE BOD_CURRENT_ACCOUNT
+        (Transaction_ID integer,
+         Account_Number integer not null,
+         Transaction_Date varchar(30) not null,
+         Details varchar(255) not null,
+         Debit float not null,
+         Credit float not null,
+         Balance float not null,
+         PRIMARY KEY (Transaction_ID),
+         CONSTRAINT BOD_CNST
+            FOREIGN KEY (Account_Number) 
+            REFERENCES BOD_USERS
+            ON DELETE CASCADE)
+            
+insert into bod_current_account values (1,12345,'09/03/2020','Initial Lodgement',0.00f,500.00f,500.00f)
+insert into bod_current_account values (2,54321,'09/03/2020','Initial Lodgement',0.00f,500.00f,500.00f)
+
+
+<h4>BOD_SAVINGS_ACCOUNT Database:</h4>
+CREATE TABLE BOD_SAVINGS_ACCOUNT
+        (Transaction_ID integer,
+         Account_Number integer not null,
+         Transaction_Date varchar(30) not null,
+         Details varchar(255) not null,
+         Debit float not null,
+         Credit float not null,
+         Balance float not null,
+         PRIMARY KEY (Transaction_ID),
+         CONSTRAINT BOD_CNST2
+            FOREIGN KEY (Account_Number) 
+            REFERENCES BOD_USERS
+            ON DELETE CASCADE)
+            
+insert into bod_savings_account values (1,12345,'09/03/2020','Initial Lodgement',0.00f,500.00f,500.00f)
+insert into bod_savings_account values (2,54321,'09/03/2020','Initial Lodgement',0.00f,500.00f,500.00f)
+
+
+<h4>BOD_ATMS Database:</h4>
+CREATE TABLE BOD_ATMS
+        (Locations varchar(80),
+         PRIMARY KEY (Locations))
+         
+insert into bod_atms values ('Baldoyle')
+insert into bod_atms values ('Raheny')
+insert into bod_atms values ('Sutton')
+</pre>
+</body>
+</html>
